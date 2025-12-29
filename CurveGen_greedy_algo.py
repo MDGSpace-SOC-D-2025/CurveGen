@@ -1,13 +1,17 @@
 import numpy as np
 from CurveGen_dataset import test_data,build_baseTerms
 
-x_data, y_data = test_data(noise=0.5) 
+x_data, y_data = test_data(noise=0) 
+
+def mse(residuals):
+    m=np.mean(residuals**2)
+    return m
 
 
 def greedy_algo(x, y):
     
     term_name,term_valv=build_baseTerms(x)
-    current_error = np.var(y) 
+    current_error = mse(y) 
     
     found_indices = []
     found_cols = []
@@ -24,7 +28,7 @@ def greedy_algo(x, y):
             
             if resid.size > 0:
                 y_pred = A_test @ coeffs
-                new_error = np.var(y - y_pred)
+                new_error = mse(y - y_pred)
             else:
                 new_error = 0.0
             improvement = (current_error - new_error) / current_error
@@ -41,7 +45,7 @@ def greedy_algo(x, y):
         A_accepted = np.column_stack(found_cols)
         coeffs, _, _, _ = np.linalg.lstsq(A_accepted, y, rcond=None)
         y_pred = A_accepted @ coeffs
-        current_error = np.var(y - y_pred)
+        current_error = mse(y - y_pred)
         if current_error < 1e-9: break
     if not found_indices: return [], []
     
