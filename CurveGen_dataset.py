@@ -1,11 +1,44 @@
 import numpy as np
 
 unit_list=['kg','m','s','A','K']
-unit_dimensions={(1.0,):'Mass',(0,1):'Length'}
-def test_data(noise=0.0):
-    def get_dimensions(a="text"):
+unit_dimensions={(1.0,):'Mass',(0.0,1.0):'Length',(0.0, 0.0, 1.0): 'Time',
+    (0.0, 0.0, 0.0, 1.0): 'Current',
+    (0.0, 0.0, 0.0, 0.0, 1.0): 'Temperature',
+    (0.0, 2.0): 'Area',
+    (0.0, 3.0): 'Volume',
+    (0.0, 1.0, -1.0): 'Velocity',
+    (0.0, 1.0, -2.0): 'Acceleration',
+    (1.0, 1.0, -2.0): 'Force',
+    (1.0, 2.0, -2.0): 'Energy',
+    (1.0, 2.0, -3.0): 'Power',
+    (1.0, -1.0, -2.0): 'Pressure',
+    (1.0, -3.0): 'Density',
+    (1.0, 1.0, -1.0): 'Momentum',
+    (0.0, 0.0, -1.0): 'Frequency',
+    (0.0, 0.0, 1.0, 1.0): 'Charge',
+    (1.0, 2.0, -3.0, -1.0): 'Voltage',
+    (1.0, 2.0, -3.0, -2.0): 'Resistance',
+    (-1.0, -2.0, 4.0, 2.0): 'Capacitance',
+    (0.0, 0.0, -1.0): 'Angular Velocity',
+    (0.0, 0.0, -2.0): 'Angular Acceleration',
+    (1.0, 2.0): 'Moment of Inertia',
+    (1.0, 2.0, -2.0): 'Torque',
+    (1.0, 0.0, -2.0): 'Surface Tension',
+    (1.0, -1.0, -1.0): 'Viscosity',
+    (0.0, 2.0, -2.0, 0.0, -1.0): 'Specific Heat',
+    (1.0, 1.0, -3.0, 0.0, -1.0): 'Thermal Conductivity',
+    (1.0, 2.0, -2.0, 0.0, -1.0): 'Entropy',
+    (1.0, 1.0, -3.0, -1.0): 'Electric Field',
+    (1.0, 2.0, -2.0, -1.0): 'Magnetic Flux',
+    (1.0, 0.0, -2.0, -1.0): 'Magnetic Flux Density',
+    (1.0, 2.0, -2.0, -2.0): 'Inductance',
+    (1.0, 2.0, -1.0): 'Planck Constant',
+    (-1.0, 3.0, -2.0): 'Gravitational Constant'}
+def get_dimensions(a="text"):
         dimensions = np.array(input(a).split(), dtype=float)
         return dimensions
+def test_data(noise=0.0):
+    
         
     """
     test_data_min = 1
@@ -30,6 +63,27 @@ def test_data(noise=0.0):
         y_test_data += np.random.normal(0, noise, size=len(y_test_data))
 
     return x_test_data, y_test_data
+
+def InputData():
+    paramters_no=int(input('enter the number of parameters you have data for'))
+    data={}
+    parameter_dimensions=[]
+
+    for i in range(paramters_no):
+        dimensions=get_dimensions("input the unit for the parameter in the form of M L T I K: ")
+        dimensions_tuple=tuple(dimensions.tolist())
+        parts = [f"{t}[{c:.3f}]" for c, t in zip(dimensions, unit_list)]
+        print(f'Physical quantity is {unit_dimensions[dimensions_tuple]},'+' unit:'+"".join(parts))
+        parameter_dimensions.append(dimensions_tuple)
+        parameter_data= np.array(input(f"Enter the data for {unit_dimensions[dimensions_tuple]} with a gap between each data point: ").split(), dtype=float)
+        data[unit_dimensions[dimensions_tuple]]=parameter_data
+    print(data) 
+    parameter_dimensions_set=set(parameter_dimensions)
+    print(parameter_dimensions_set) 
+    
+    return data,parameter_dimensions_set
+
+
 
 def build_baseTerms(x):
     x_clean=np.abs(x)+1e-9
