@@ -7,23 +7,20 @@ def mse(residuals):
     m=np.mean(residuals**2)
     return m
 
-
 def greedy_algo(x, y):
     
     term_name,term_valv=build_baseTerms(x)
     current_error = mse(y) 
-    
     found_indices = []
     found_cols = []
     
-    for step in range(5):
+    for step in range(3):
         best_idx = -1
         best_improvement = 0.0        
         for i in range(len(term_name)):
             if i in found_indices: continue 
             current_cols = found_cols + [term_valv[i]]
             A_test = np.column_stack(current_cols)
-
             coeffs, resid, _, _ = np.linalg.lstsq(A_test, y, rcond=None)
             
             if resid.size > 0:
@@ -53,7 +50,6 @@ def greedy_algo(x, y):
     final_coeffs, _, _, _ = np.linalg.lstsq(A_final, y, rcond=None)
     
     return final_coeffs, [term_name[i] for i in found_indices]
-
 
 coeffs, terms = greedy_algo(x_data, y_data)
 

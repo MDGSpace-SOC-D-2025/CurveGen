@@ -1,9 +1,6 @@
 import numpy as np
 from CurveGen_dataset import test_data,build_baseTerms
-
-
-
-def solveSindy(x, y):
+def lstsq(x, y):
    term_name,term_valv=build_baseTerms(x)
 
    A = np.column_stack(term_valv)
@@ -46,7 +43,7 @@ def solveSindy(x, y):
    return [], []
 
 x_data, y_data = test_data(noise=0.01)
-coeffs, terms = solveSindy(x_data, y_data)
+coeffs, terms = lstsq(x_data, y_data)
 
 parts = [f"{c:.3f}[{t}]" for c, t in zip(coeffs, terms)]
 print(" + ".join(parts))

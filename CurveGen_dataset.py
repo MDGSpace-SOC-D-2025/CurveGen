@@ -40,13 +40,13 @@ def get_dimensions(a="text"):
 def test_data(noise=0.0):
     
         
-    """
+    
     test_data_min = 1
     test_data_max = 10
     test_values = 100
     x_test_data = np.linspace(test_data_min, test_data_max, test_values)    
-    y_test_data = np.exp(x_test_data*2)+x_test_data*x_test_data+x_test_data+0.8
-    """
+    y_test_data = 4*np.sqrt(3*x_test_data+2)+10
+    '''
     x_test_data = np.array(input("Enter the values of one of the parameters: ").split(), dtype=float)
     x_dimensions=get_dimensions("input the unit for the parameter in the form of M L T I K")
     x_dimensions_tuple=tuple(x_dimensions.tolist())
@@ -58,7 +58,7 @@ def test_data(noise=0.0):
     y_dimensions=get_dimensions("input the unit for the results in the form of M L T I K")
     y_dimensions_tuple=tuple(y_dimensions.tolist())
     parts = [f"{t}[{c:.3f}]" for c, t in zip(y_dimensions, unit_list)]
-    print(f'Physical quantity is {unit_dimensions[y_dimensions_tuple]},'+' unit:'+"".join(parts))
+    print(f'Physical quantity is {unit_dimensions[y_dimensions_tuple]},'+' unit:'+"".join(parts))'''
     if noise > 0:
         y_test_data += np.random.normal(0, noise, size=len(y_test_data))
 
