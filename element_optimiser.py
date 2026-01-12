@@ -2,7 +2,7 @@ import numpy as np
 from scipy.optimize import curve_fit
 from CurveGen_dataset import test_data
 
-x_data, y_data = test_data(noise=0) 
+x_data, y_data = test_data(noise=1)
 
 def linear(x, A, B):
     return A*x + B
@@ -31,124 +31,111 @@ def sqrt(x, a, b, c):
 def inverseSQRT(x, a, b, c):
     return a / (np.sqrt(x + b)) + c
 
-lowestError = float('inf') 
-BestType = "None"
-best_expression = "None"
+lowest_error = float('inf') 
+best_result_name = "None"
 
 try:
     popt, pcov = curve_fit(linear, x_data, y_data)
-    a, b = popt
     error = np.sum((y_data - linear(x_data, *popt))**2)
     
-    if error < lowestError:
-        lowestError = error
-        BestType = "linear"
-        best_expression = f"{a:.3f}x + {b:.3f}"
+    if error < lowest_error:
+        lowest_error = error
+        best_result_name = "linear"
 except RuntimeError:
     pass 
 
 try:
     popt, pcov = curve_fit(quadratic, x_data, y_data)
-    a, b, c = popt
     error = np.sum((y_data - quadratic(x_data, *popt))**2)
     
-    if error < lowestError:
-        lowestError = error
-        BestType = "quadratic"
-        best_expression = f"{a:.3f}x^2 + {b:.3f}x + {c:.3f}"
+    if error < lowest_error:
+        lowest_error = error
+        best_result_name = "quadratic"
 except RuntimeError:
     pass
 
 try:
     popt, pcov = curve_fit(power, x_data, y_data)
-    a, n, c = popt
     error = np.sum((y_data - power(x_data, *popt))**2)
     
-    if error < lowestError:
-        lowestError = error
-        BestType = "power"
-        best_expression = f"{a:.3f}x^{n:.3f} + {c:.3f}"
+    if error < lowest_error:
+        lowest_error = error
+        best_result_name = "power"
 except RuntimeError:
     pass
 
 try:
-    popt, pcov = curve_fit(sine, x_data, y_data, p0=[1, 1, 0, 0]) # p0 helps sine converge
-    a, k, p, c = popt
-    error = np.sum((y_data - sine(x_data, *popt))**2)
-
+    guess_offset = np.mean(y_data)
+    guess_amp = (np.max(y_data) - np.min(y_data)) / 2
     
-    if error < lowestError:
-        lowestError = error
-        BestType = "sine"
-        best_expression = f"{a:.3f}sin({k:.3f}x + {p:.3f}) + {c:.3f}"
+    fft_spectrum = np.fft.rfft(y_data - guess_offset)
+    fft_freqs = np.fft.rfftfreq(len(y_data), d=(x_data[1]-x_data[0]))
+    
+    peak_idx = np.argmax(np.abs(fft_spectrum))
+    guess_freq = fft_freqs[peak_idx]
+    guess_k = 2 * np.pi * guess_freq
+    if guess_k == 0: guess_k = 1.0
+
+    p0_sine = [guess_amp, guess_k, 0, guess_offset]
+
+    popt, pcov = curve_fit(sine, x_data, y_data, p0=p0_sine, maxfev=5000)
+    error = np.sum((y_data - sine(x_data, *popt))**2)
+    
+    if error < lowest_error:
+        lowest_error = error
+        best_result_name = "sine"
 except RuntimeError:
     pass
 
 try:
     popt, pcov = curve_fit(exponential, x_data, y_data)
-    a, k, c = popt
     error = np.sum((y_data - exponential(x_data, *popt))**2)
     
-    if error < lowestError:
-        lowestError = error
-        BestType = "exponential"
-        best_expression = f"{a:.3f}e^({k:.3f}x) + {c:.3f}"
+    if error < lowest_error:
+        lowest_error = error
+        best_result_name = "exponential"
 except RuntimeError:
     pass
 
 try:
     popt, pcov = curve_fit(inverse, x_data, y_data)
-    a, b, c = popt
     error = np.sum((y_data - inverse(x_data, *popt))**2)
     
-    if error < lowestError:
-        lowestError = error
-        BestType = "inverse"
-        best_expression = f"{a:.3f}/(x + {b:.3f}) + {c:.3f}"
+    if error < lowest_error:
+        lowest_error = error
+        best_result_name = "inverse"
 except RuntimeError:
     pass
 
 try:
     popt, pcov = curve_fit(inverse_square, x_data, y_data)
-    a, c = popt
     error = np.sum((y_data - inverse_square(x_data, *popt))**2)
     
-    if error < lowestError:
-        lowestError = error
-        BestType = "inverse_square"
-        best_expression = f"{a:.3f}/x^2 + {c:.3f}"
+    if error < lowest_error:
+        lowest_error = error
+        best_result_name = "inverse_square"
 except RuntimeError:
     pass
 
 try:
     popt, pcov = curve_fit(sqrt, x_data, y_data)
-    a, b, c = popt
     error = np.sum((y_data - sqrt(x_data, *popt))**2)
     
-    if error < lowestError:
-        lowestError = error
-        BestType = "sqrt"
-        best_expression = f"{a:.3f}sqrt(x + {b:.3f}) + {c:.3f}"
+    if error < lowest_error:
+        lowest_error = error
+        best_result_name = "sqrt"
 except RuntimeError:
     pass
 
 try:
     popt, pcov = curve_fit(inverseSQRT, x_data, y_data)
-    a, b, c = popt
     error = np.sum((y_data - inverseSQRT(x_data, *popt))**2)
     
-    if error < lowestError:
-        lowestError = error
-        BestType = "inverseSQRT"
-        best_expression = f"{a:.3f}/sqrt(x + {b:.3f}) + {c:.3f}"
+    if error < lowest_error:
+        lowest_error = error
+        best_result_name = "inverseSQRT"
 except RuntimeError:
     pass
 
-print(f"Best Fit Type: {BestType}")
-print(f"Error: {lowestError}")
-print(f"Expression: {best_expression}")
-
-
-
-
-
+print(f"Best Fit Type: {best_result_name}")
+print(f"Error (SSR): {lowest_error}")

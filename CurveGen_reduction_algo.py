@@ -18,7 +18,8 @@ def build_baseTerms(x):
         "exp":    np.exp(x),
         "log":    np.log(x_clean),
         "1/exp":  np.exp(x*(-1)),
-        "1/exp2": np.exp(x*x*(-1))
+        "1/exp2": np.exp(x*x*(-1)),
+        "sqrt":   np.sqrt(x_clean)
     }
     
     term_name = []

@@ -45,7 +45,7 @@ def test_data(noise=0.0):
     test_data_max = 10
     test_values = 100
     x_test_data = np.linspace(test_data_min, test_data_max, test_values)    
-    y_test_data = 4*np.sqrt(3*x_test_data+2)+10
+    y_test_data = 3*np.sin(x_test_data*2+3)+45
     '''
     x_test_data = np.array(input("Enter the values of one of the parameters: ").split(), dtype=float)
     x_dimensions=get_dimensions("input the unit for the parameter in the form of M L T I K")
